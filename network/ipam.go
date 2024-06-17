@@ -22,7 +22,7 @@ var ipAllocator = &IPAM{
 	SubnetAllocatorPath: ipamDefaultAllocatorPath,
 }
 
-func (ipam *IPAM) load() error {
+func (ipam *IPAM) load() (err error) {
 	if _, err := os.Stat(ipam.SubnetAllocatorPath); err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -31,7 +31,9 @@ func (ipam *IPAM) load() error {
 		}
 	}
 	subnetConfigFile, err := os.Open(ipam.SubnetAllocatorPath)
-	defer subnetConfigFile.Close()
+	defer func() {
+		err = subnetConfigFile.Close()
+	}()
 	if err != nil {
 		return err
 	}
@@ -49,18 +51,20 @@ func (ipam *IPAM) load() error {
 	return nil
 }
 
-func (ipam *IPAM) dump() error {
+func (ipam *IPAM) dump() (err error) {
 	ipamConfigFileDir, _ := path.Split(ipam.SubnetAllocatorPath)
 	if _, err := os.Stat(ipamConfigFileDir); err != nil {
 		if os.IsNotExist(err) {
-			os.MkdirAll(ipamConfigFileDir, 0644)
+			err = os.MkdirAll(ipamConfigFileDir, 0644)
 		} else {
 			return err
 		}
 	}
 	subnetConfigFile, err := os.OpenFile(ipam.SubnetAllocatorPath,
 		os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0644)
-	defer subnetConfigFile.Close()
+	defer func() {
+		err = subnetConfigFile.Close()
+	}()
 	if err != nil {
 		return err
 	}
@@ -111,7 +115,7 @@ func (ipam *IPAM) Allocate(subnet *net.IPNet) (ip net.IP, err error) {
 		}
 	}
 
-	ipam.dump()
+	err = ipam.dump()
 	return
 
 }
@@ -138,6 +142,6 @@ func (ipam *IPAM) Release(subnet *net.IPNet, ipaddr *net.IP) error {
 	ipalloc[c] = 0
 	(*ipam.Subnets)[subnet.String()] = ipalloc
 
-	ipam.dump()
+	err = ipam.dump()
 	return nil
 }

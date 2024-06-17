@@ -60,15 +60,24 @@ func setUpMount() {
 	}
 	log.Infof("Current location is [%s]", pwd)
 
-	syscall.Mount("", "/", "", syscall.MS_PRIVATE|syscall.MS_REC, "")
+	err = syscall.Mount("", "/", "", syscall.MS_PRIVATE|syscall.MS_REC, "")
+	if err != nil {
+		log.Warn("can't mount at `/`")
+	}
 
 	if err := pivotRoot(pwd); err != nil {
 		log.Errorf("Error when call pivotRoot %v", err)
 	}
 
 	defaultMountFlags := syscall.MS_NOEXEC | syscall.MS_NODEV | syscall.MS_NOSUID
-	syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
-	syscall.Mount("tmpfs", "/dev", "tmpfs", syscall.MS_NOSUID|syscall.MS_STRICTATIME, "mode=755")
+	err = syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
+	if err != nil {
+		log.Warn("can't mount at `/proc`")
+	}
+	err = syscall.Mount("tmpfs", "/dev", "tmpfs", syscall.MS_NOSUID|syscall.MS_STRICTATIME, "mode=755")
+	if err != nil {
+		log.Warn("can't mount at `/dev`")
+	}
 }
 
 /* pivot_root Semantics:

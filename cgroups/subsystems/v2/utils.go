@@ -10,11 +10,11 @@ import (
 
 var Root string
 
-func GetCgroupPath(cgroupPath string, autoCreate bool) (string, error) {
+func GetCgroupPath(cgroupPath string, autoCreate bool) (s string, err error) {
 
 	var cgroupRoot string
 	if cgroupPath != "" {
-		Root = FindCgroupMountpoint()
+		Root, err = FindCgroupMountpoint()
 		cgroupRoot = FindAbsoluteCgroupMountpoint()
 
 	} else {
@@ -22,7 +22,7 @@ func GetCgroupPath(cgroupPath string, autoCreate bool) (string, error) {
 		fmt.Println(cgroupRoot)
 	}
 
-	_, err := os.Stat(path.Join(cgroupRoot, cgroupPath))
+	_, err = os.Stat(path.Join(cgroupRoot, cgroupPath))
 	if err == nil || (autoCreate && os.IsNotExist(err)) {
 		if os.IsNotExist(err) {
 			if err := os.Mkdir(path.Join(cgroupRoot, cgroupPath), os.ModePerm); err != nil {
@@ -40,20 +40,22 @@ func FindAbsoluteCgroupMountpoint() string {
 	return "/sys/fs/cgroup"
 }
 
-func FindCgroupMountpoint() string {
+func FindCgroupMountpoint() (s string, err error) {
 	f, err := os.Open("/proc/self/cgroup")
 	if err != nil {
-		return ""
+		return "", err
 	}
-	defer f.Close()
+	defer func() {
+		err = f.Close()
+	}()
 
 	rawPath, err := ioutil.ReadAll(f)
 	if err != nil {
-		return ""
+		return "", err
 	}
 	arr := strings.Split(string(rawPath), ":")
 	fp := arr[len(arr)-1]
 
-	return "/sys/fs/cgroup" + string(fp[:len(fp)-1])
+	return "/sys/fs/cgroup" + string(fp[:len(fp)-1]), nil
 
 }

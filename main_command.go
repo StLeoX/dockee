@@ -115,8 +115,11 @@ var runCommand = cli.Command{
 		network := context.String("net")
 		// port
 		portmapping := context.StringSlice("p")
-		Run(tty, cmdArray, resConf, volume, imageName, containerName,
+		err := Run(tty, cmdArray, resConf, volume, imageName, containerName,
 			envSlice, network, portmapping)
+		if err != nil {
+			return fmt.Errorf("run error %v", err)
+		}
 		return nil
 	},
 }
@@ -239,8 +242,11 @@ var networkCommand = cli.Command{
 				if len(context.Args()) < 1 {
 					return fmt.Errorf("Missing network name")
 				}
-				network.Init()
-				err := network.CreateNetwork(context.String("driver"),
+				err := network.Init()
+				if err != nil {
+					return fmt.Errorf("init network error: %+v", err)
+				}
+				err = network.CreateNetwork(context.String("driver"),
 					context.String("subnet"), context.Args()[0])
 				if err != nil {
 					return fmt.Errorf("create network error: %+v", err)
@@ -252,7 +258,10 @@ var networkCommand = cli.Command{
 			Name:  "list",
 			Usage: "list container network",
 			Action: func(context *cli.Context) error {
-				network.Init()
+				err := network.Init()
+				if err != nil {
+					return fmt.Errorf("init network error: %+v", err)
+				}
 				network.ListNetwork()
 				return nil
 			},
@@ -264,37 +273,16 @@ var networkCommand = cli.Command{
 				if len(context.Args()) < 1 {
 					return fmt.Errorf("Missing network name")
 				}
-				network.Init()
-				err := network.DeleteNetwork(context.Args()[0])
+				err := network.Init()
+				if err != nil {
+					return fmt.Errorf("init network error: %+v", err)
+				}
+				err = network.DeleteNetwork(context.Args()[0])
 				if err != nil {
 					return fmt.Errorf("remove network error: %+v", err)
 				}
 				return nil
 			},
 		},
-	},
-}
-
-// TODO 之后写完OSS了 把eoss作为镜像站
-var pullCommand = cli.Command{
-	Name:  "pull",
-	Usage: "pull image",
-	Action: func(context *cli.Context) error {
-		if len(context.Args()) < 1 {
-			return fmt.Errorf("Missing image name")
-		}
-		return nil
-	},
-}
-
-// TODO 之后写完OSS了 把eoss作为镜像站
-var pushCommand = cli.Command{
-	Name:  "push",
-	Usage: "push image",
-	Action: func(context *cli.Context) error {
-		if len(context.Args()) < 1 {
-			return fmt.Errorf("Missing image name")
-		}
-		return nil
 	},
 }

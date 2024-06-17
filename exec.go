@@ -33,8 +33,14 @@ func ExecContainer(containerName string, comArray []string) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	os.Setenv(ENV_EXEC_PID, pid)
-	os.Setenv(ENV_EXEC_CMD, cmdStr)
+	err = os.Setenv(ENV_EXEC_PID, pid)
+	if err != nil {
+		logrus.Warn("can't set environment variable")
+	}
+	err = os.Setenv(ENV_EXEC_CMD, cmdStr)
+	if err != nil {
+		logrus.Warn("can't set environment variable")
+	}
 	containerEnvs := getEnvsByPid(pid)
 	cmd.Env = append(os.Environ(), containerEnvs...)
 

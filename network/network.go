@@ -58,10 +58,10 @@ type NetworkDriver interface {
 }
 
 // 将这个网络的配置信息保存在文件系统中
-func (nw *Network) dump(dumpPath string) error {
+func (nw *Network) dump(dumpPath string) (err error) {
 	if _, err := os.Stat(dumpPath); err != nil {
 		if os.IsNotExist(err) {
-			os.MkdirAll(dumpPath, 0644)
+			err = os.MkdirAll(dumpPath, 0644)
 		} else {
 			return err
 		}
@@ -73,7 +73,9 @@ func (nw *Network) dump(dumpPath string) error {
 		logrus.Errorf("error：%v", err)
 		return err
 	}
-	defer nwFile.Close()
+	defer func() {
+		err = nwFile.Close()
+	}()
 
 	nwJson, err := json.Marshal(nw)
 	if err != nil {
@@ -91,9 +93,9 @@ func (nw *Network) dump(dumpPath string) error {
 }
 
 // 从网络的配置目录中的文件读取到网络的配置
-func (nw *Network) load(dumpPath string) error {
+func (nw *Network) load(dumpPath string) (err error) {
 	nwConfigFile, err := os.Open(dumpPath)
-	defer nwConfigFile.Close()
+	defer func() { err = nwConfigFile.Close() }()
 	if err != nil {
 		return err
 	}
@@ -124,19 +126,19 @@ func (nw *Network) remove(dumpPath string) error {
 	}
 }
 
-func Init() error {
+func Init() (err error) {
 	var bridgeDriver = BridgeNetworkDriver{}
 	drivers[bridgeDriver.Name()] = &bridgeDriver // 注册一个网桥设备驱动
 
 	if _, err := os.Stat(defaultNetworkPath); err != nil {
 		if os.IsNotExist(err) {
-			os.MkdirAll(defaultNetworkPath, 0644)
+			err = os.MkdirAll(defaultNetworkPath, 0644)
 		} else {
 			return err
 		}
 	}
 
-	filepath.Walk(defaultNetworkPath, func(nwPath string, info os.FileInfo, err error) error {
+	err = filepath.Walk(defaultNetworkPath, func(nwPath string, info os.FileInfo, err error) error {
 		if strings.Count(nwPath, "/")-strings.Count(defaultNetworkPath, "/") > 0 || info.IsDir() {
 			return nil
 		}

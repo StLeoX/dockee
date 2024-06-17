@@ -16,14 +16,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var (
-	RUNNING             string = "running"
-	STOP                string = "stopped"
-	Exit                string = "exited"
-	DefaultInfoLocation string = "/var/run/dockee/%s/"
-	ConfigName          string = "config.json"
-)
-
 type ContainerInfo struct {
 	Pid         string `json:"pid"`         // 容器的init进程在宿主机上的 PID
 	Id          string `json:"id"`          // 容器Id
@@ -37,7 +29,7 @@ type ContainerInfo struct {
 
 func Run(tty bool, comArray []string, res *subsystems.ResourceConfig,
 	volume, imageName, containerName string, envSlice []string,
-	nw string, portmapping []string) {
+	nw string, portmapping []string) (err error) {
 
 	// containerInit 包含容器初始化时需要记录的一些信息
 	containerInit, parent, writePipe := container.NewParentProcess(tty, imageName, volume, envSlice)
@@ -50,7 +42,7 @@ func Run(tty bool, comArray []string, res *subsystems.ResourceConfig,
 	}
 
 	// record container info
-	containerName, err := recordContainerInfo(containerInit, parent.Process.Pid,
+	containerName, err = recordContainerInfo(containerInit, parent.Process.Pid,
 		containerName, comArray)
 	if err != nil {
 		log.Errorf("Record container info error %v", err)
@@ -64,31 +56,35 @@ func Run(tty bool, comArray []string, res *subsystems.ResourceConfig,
 		// cgroup 1
 		cgroupManager := cgroups.NewCgroupManager("")
 		if tty {
-			defer cgroupManager.Destroy()
+			defer func() {
+				err = cgroupManager.Destroy()
+			}()
 		}
-		cgroupManager.Set(res)
-		cgroupManager.Apply(parent.Process.Pid)
+		err = cgroupManager.Set(res)
+		err = cgroupManager.Apply(parent.Process.Pid)
 
 	} else {
 		// cgroup 2
 		cgroupManager := cgroups.NewCgroupManager(containerInit.Id_base)
 		if tty {
-			defer cgroupManager.Destroy2()
+			defer func() {
+				err = cgroupManager.Destroy()
+			}()
 		}
-		cgroupManager.Set2(res)
-		cgroupManager.Apply2(parent.Process.Pid)
+		err = cgroupManager.Set2(res)
+		err = cgroupManager.Apply2(parent.Process.Pid)
 	}
 
 	if nw != "" {
 		// config container network
-		network.Init()
+		err = network.Init()
 		containerInfo := &container.ContainerInfo{
 			Id:          containerInit.Id,
 			Pid:         strconv.Itoa(parent.Process.Pid),
 			Name:        containerName,
 			PortMapping: portmapping,
 		}
-		if err := network.Connect(nw, containerInfo); err != nil {
+		if err = network.Connect(nw, containerInfo); err != nil {
 			log.Errorf("Error Connetc Newwork %v", err)
 			return
 		}
@@ -97,10 +93,11 @@ func Run(tty bool, comArray []string, res *subsystems.ResourceConfig,
 	sendInitCommand(comArray, writePipe)
 
 	if tty {
-		parent.Wait()
+		err = parent.Wait()
 		// 停止容器
 		stopHook(containerName)
 	}
+	return nil
 }
 
 func recordContainerInfo(containerInit *container.ContainerInit, containerPID int,
@@ -149,7 +146,7 @@ func recordContainerInfo(containerInit *container.ContainerInit, containerPID in
 
 	fileName := dirUrl + container.ConfigName
 	file, err := os.Create(fileName)
-	defer file.Close()
+	defer func() { err = file.Close() }()
 	if err != nil {
 		log.Errorf("Create file %s error %v", fileName, err)
 		return "", err
