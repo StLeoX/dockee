@@ -11,6 +11,7 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "dockee"
+	app.Usage = "A docker-like container CLI application"
 
 	app.Commands = []cli.Command{
 		initCommand,

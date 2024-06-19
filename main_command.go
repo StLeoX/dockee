@@ -13,7 +13,7 @@ import (
 
 var initCommand = cli.Command{
 	Name:  "init",
-	Usage: "Init container(Internal commands, do not use directly)",
+	Usage: "Init container (Internal command, do not use directly)",
 	Action: func(context *cli.Context) error {
 		log.Infof("initing the container")
 		cmd := context.Args().Get(0)
@@ -24,7 +24,7 @@ var initCommand = cli.Command{
 }
 var reInitCommand = cli.Command{
 	Name:  "reinit",
-	Usage: "Reinit container(Internal commands, do not use directly)",
+	Usage: "Reinit container (Internal command, do not use directly)",
 	Action: func(context *cli.Context) error {
 		log.Infof("reinit come on")
 		cmd := context.Args().Get(0)

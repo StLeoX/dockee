@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"text/tabwriter"
 
 	"github.com/impact-eintr/dockee/container"
@@ -34,6 +35,11 @@ func ListContainers() {
 		}
 		containers = append(containers, tmpContainer)
 	}
+
+	// 按照 CREATED 最新排序
+	sort.Slice(containers, func(i, j int) bool {
+		return containers[i].CreatedTime > containers[j].CreatedTime
+	})
 
 	w := tabwriter.NewWriter(os.Stdout, 12, 1, 3, ' ', 0)
 	fmt.Fprint(w, "ID\tNAME\tPID\tSTATUS\tCOMMAND\tCREATED\n")
