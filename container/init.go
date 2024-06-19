@@ -39,7 +39,7 @@ func RunContainerInitProcess() error {
 }
 
 func readUserCommand() []string {
-	log.Infof("read parent pipe cmd")
+	log.Debugf("reading the parent pipe cmd")
 	pipe := os.NewFile(uintptr(3), "pipe")
 	msg, err := ioutil.ReadAll(pipe)
 	if err != nil {
@@ -47,7 +47,7 @@ func readUserCommand() []string {
 		return nil
 	}
 	msgStr := string(msg)
-	log.Infof("receive %s", msgStr)
+	log.Debugf("receive %s", msgStr)
 	return strings.Split(msgStr, " ")
 
 }
@@ -58,7 +58,7 @@ func setUpMount() {
 	if err != nil {
 		log.Errorf("Get current working directory error. %s", err)
 	}
-	log.Infof("Current location is [%s]", pwd)
+	log.Debugf("current mount location is [%s]", pwd)
 
 	err = syscall.Mount("", "/", "", syscall.MS_PRIVATE|syscall.MS_REC, "")
 	if err != nil {
@@ -119,7 +119,7 @@ func pivotRoot(root string) error {
 	if err := syscall.PivotRoot(root, pivotDir); err != nil {
 		return fmt.Errorf("privot_root error %v", err)
 	}
-	log.Infof("now change dir to root")
+	log.Debugf("now change dir to root")
 	if err := syscall.Chdir("/"); err != nil {
 		return fmt.Errorf("chdir / %v", err)
 	}

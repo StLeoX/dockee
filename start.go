@@ -28,8 +28,6 @@ func startContainer(containerName string) {
 		log.Errorf("New parent process error: %v", err)
 	}
 
-	// TODO  cgroup 之后再支持
-
 	// 把新的容器信息写回配置文件
 	info.Status = container.RUNNING
 	info.Pid = fmt.Sprintf("%d", parent.Process.Pid)
@@ -46,5 +44,5 @@ func startContainer(containerName string) {
 	}
 	sendInitCommand([]string{info.Command}, writePipe)
 
-	log.Infof("%s 成功启动", containerName)
+	log.Infof("%s started", containerName)
 }

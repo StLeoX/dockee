@@ -173,9 +173,9 @@ func NewWorkSpace(imageURL, rootURL, mntURL, volume string) {
 		length := len(volumeURLs)
 		if length == 2 && volumeURLs[0] != "" && volumeURLs[1] != "" {
 			MountVolume(rootURL, mntURL, volumeURLs)
-			log.Infof("%q", volumeURLs)
+			log.Debugf("%q", volumeURLs)
 		} else {
-			log.Infof("Vplume parameter input is not correct.")
+			log.Warnf("check that volume argument")
 		}
 	}
 }
@@ -189,13 +189,13 @@ func volumeUrlExtract(volume string) []string {
 func MountVolume(rootURL string, mntURL string, volumeURLs []string) {
 	parentUrl := volumeURLs[0]
 	if err := os.MkdirAll(parentUrl, 0777); err != nil {
-		log.Infof("Mkdir parent dir %s error. %v", parentUrl, err)
+		log.Errorf("Mkdir parent dir %s error. %v", parentUrl, err)
 	}
 
 	containerUrl := volumeURLs[1]
 	containerVolumeURL := mntURL + containerUrl
 	if err := os.MkdirAll(containerVolumeURL, 0777); err != nil {
-		log.Infof("Mkdir container dir %s error. %v", containerVolumeURL, err)
+		log.Errorf("Mkdir container dir %s error. %v", containerVolumeURL, err)
 	}
 
 	cmd := exec.Command("mount", "--bind", parentUrl, containerVolumeURL)
@@ -209,7 +209,7 @@ func MountVolume(rootURL string, mntURL string, volumeURLs []string) {
 func CreateRootDir(rootURL string) {
 	exist, err := PathExists(rootURL)
 	if err != nil {
-		log.Infof("Fail to judge whether dir %s exists. %v", rootURL, err)
+		log.Warnf("Fail to judge whether dir %s exists. %v", rootURL, err)
 	}
 	if !exist {
 		if err := os.MkdirAll(rootURL, 0777); err != nil {
@@ -228,7 +228,7 @@ func CreateLowerLayer(imageURL, rootURL string) {
 
 	exist, err := PathExists(busyboxURL)
 	if err != nil {
-		log.Infof("Fail to judge whether dir %s exists. %v", busyboxURL, err)
+		log.Warnf("Fail to judge whether dir %s exists. %v", busyboxURL, err)
 	}
 	if !exist {
 		if err := os.MkdirAll(busyboxURL, 0777); err != nil {
@@ -245,7 +245,7 @@ func CreateUpperLayer(rootURL string) {
 	upperURL := rootURL + "/upper"
 	exist, err := PathExists(upperURL)
 	if err != nil {
-		log.Infof("Fail to judge whether dir %s exists. %v", upperURL, err)
+		log.Warnf("Fail to judge whether dir %s exists. %v", upperURL, err)
 	}
 	if !exist {
 		if err := os.MkdirAll(upperURL, 0777); err != nil {
@@ -258,7 +258,7 @@ func CreateWorkDir(rootURL string) {
 	workURL := rootURL + "/work"
 	exist, err := PathExists(workURL)
 	if err != nil {
-		log.Infof("Fail to judge whether dir %s exists. %v", workURL, err)
+		log.Warnf("Fail to judge whether dir %s exists. %v", workURL, err)
 	}
 	if !exist {
 		if err := os.MkdirAll(workURL, 0777); err != nil {
@@ -271,7 +271,7 @@ func CreateMountPoint(imageURL string, rootURL string) {
 	mntURL := rootURL + "/merge"
 	exist, err := PathExists(mntURL)
 	if err != nil {
-		log.Infof("Fail to judge whether dir %s exists. %v", mntURL, err)
+		log.Warnf("Fail to judge whether dir %s exists. %v", mntURL, err)
 	}
 	if !exist {
 		if err := os.MkdirAll(mntURL, 0777); err != nil {

@@ -173,7 +173,7 @@ func deleteContainerInfo(containerId, containerName string) {
 
 func sendInitCommand(comArray []string, writePipe *os.File) {
 	command := strings.Join(comArray, " ")
-	log.Infof("command all is %s", command)
+	log.Debugf("command all is %s", command)
 	writePipe.WriteString(command)
 	writePipe.Close()
 }

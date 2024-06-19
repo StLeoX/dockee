@@ -15,9 +15,9 @@ var initCommand = cli.Command{
 	Name:  "init",
 	Usage: "Init container(Internal commands, do not use directly)",
 	Action: func(context *cli.Context) error {
-		log.Infof("init come on")
+		log.Infof("initing the container")
 		cmd := context.Args().Get(0)
-		log.Infof("command %s", cmd)
+		log.Debugf("command %s", cmd)
 		err := container.RunContainerInitProcess()
 		return err
 	},
@@ -28,7 +28,7 @@ var reInitCommand = cli.Command{
 	Action: func(context *cli.Context) error {
 		log.Infof("reinit come on")
 		cmd := context.Args().Get(0)
-		log.Infof("command %s", cmd)
+		log.Debugf("command %s", cmd)
 		err := container.RunContainerInitProcess()
 		return err
 	},
@@ -166,7 +166,7 @@ var execCommand = cli.Command{
 	Action: func(context *cli.Context) error {
 		//This is for callback
 		if os.Getenv(ENV_EXEC_PID) != "" {
-			log.Infof("pid callback pid %d", os.Getgid())
+			log.Debugf("pid callback pid %d", os.Getgid())
 			return nil
 		}
 

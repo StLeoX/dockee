@@ -7,15 +7,10 @@ import (
 	"github.com/urfave/cli"
 )
 
-const usage = "dockee is a simple container runtime implementation"
-
 func main() {
 
 	app := cli.NewApp()
 	app.Name = "dockee"
-	app.Usage = usage
-
-	log.Println(usage)
 
 	app.Commands = []cli.Command{
 		initCommand,
@@ -31,9 +26,28 @@ func main() {
 		networkCommand,
 	}
 
+	// debug flag for debug mode
+	debugFlag := &cli.BoolFlag{
+		Name:  "debug",
+		Usage: "enable debug mode",
+	}
+	app.Flags = []cli.Flag{
+		debugFlag,
+	}
+
 	app.Before = func(context *cli.Context) error {
-		log.SetFormatter(&log.JSONFormatter{})
+		// log.SetFormatter(&log.JSONFormatter{})
+
+		// todo 日志改到文件，标准输出有点奇怪
 		log.SetOutput(os.Stdout)
+
+		// 设置日志模式
+		if context.Bool("debug") {
+			log.SetLevel(log.DebugLevel)
+		} else {
+			log.SetLevel(log.InfoLevel)
+		}
+
 		return nil
 	}
 
