@@ -60,7 +60,12 @@ func GetContainerPidByName(containerName string) (string, error) {
 	if err := json.Unmarshal(contentBytes, &containerInfo); err != nil {
 		return "", err
 	}
-	return containerInfo.Pid, nil
+	pid := containerInfo.Pid
+	if strings.Contains(pid, " ") {
+		return "", fmt.Errorf("check the status of container %s", containerName)
+	}
+
+	return pid, nil
 }
 
 func getEnvsByPid(pid string) []string {
