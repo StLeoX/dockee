@@ -2,7 +2,7 @@ package v1
 
 import (
 	"bufio"
-	"fmt"
+	// "fmt"
 	"os"
 	"path"
 	"strings"
@@ -33,16 +33,29 @@ func FindCgroupMountpoint(subsystem string) string {
 }
 
 func GetCgroupPath(subsystem string, cgroupPath string, autoCreate bool) (string, error) {
+	// cgroupRoot := FindCgroupMountpoint(subsystem)
+	// if _, err := os.Stat(path.Join(cgroupRoot, cgroupPath)); err == nil || (autoCreate && os.IsNotExist(err)) {
+	// 	if os.IsNotExist(err) {
+	// 		if err := os.Mkdir(path.Join(cgroupRoot, cgroupPath), 0755); err == nil {
+	// 		} else {
+	// 			return "", fmt.Errorf("error create cgroup %v", err)
+	// 		}
+	// 	}
+	// 	return path.Join(cgroupRoot, cgroupPath), nil
+	// } else {
+	// 	return "", fmt.Errorf("cgroup path error %v", err)
+	// }
 	cgroupRoot := FindCgroupMountpoint(subsystem)
-	if _, err := os.Stat(path.Join(cgroupRoot, cgroupPath)); err == nil || (autoCreate && os.IsNotExist(err)) {
-		if os.IsNotExist(err) {
-			if err := os.Mkdir(path.Join(cgroupRoot, cgroupPath), 0755); err == nil {
-			} else {
-				return "", fmt.Errorf("error create cgroup %v", err)
-			}
-		}
-		return path.Join(cgroupRoot, cgroupPath), nil
-	} else {
-		return "", fmt.Errorf("cgroup path error %v", err)
+	absPath := path.Join(cgroupRoot, cgroupPath)
+	if !autoCreate {
+		return absPath, nil
 	}
+
+	_, err := os.Stat(absPath)
+	if err != nil && os.IsNotExist(err) {
+		err = os.Mkdir(absPath, 0755)
+		return absPath, err
+	}
+
+	return absPath, nil
 }
