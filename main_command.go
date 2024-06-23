@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/impact-eintr/dockee/cgroups/subsystems"
-	"github.com/impact-eintr/dockee/container"
-	"github.com/impact-eintr/dockee/network"
 	log "github.com/sirupsen/logrus"
+	"github.com/stleox/dockee/cgroups/subsystems"
+	"github.com/stleox/dockee/container"
+	"github.com/stleox/dockee/network"
 	"github.com/urfave/cli"
 )
 

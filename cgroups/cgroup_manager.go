@@ -1,10 +1,10 @@
 package cgroups
 
 import (
-	"github.com/impact-eintr/dockee/cgroups/subsystems"
-	subV1 "github.com/impact-eintr/dockee/cgroups/subsystems/v1"
-	subV2 "github.com/impact-eintr/dockee/cgroups/subsystems/v2"
 	log "github.com/sirupsen/logrus"
+	"github.com/stleox/dockee/cgroups/subsystems"
+	subV1 "github.com/stleox/dockee/cgroups/subsystems/v1"
+	subV2 "github.com/stleox/dockee/cgroups/subsystems/v2"
 )
 
 type CgroupManager struct {

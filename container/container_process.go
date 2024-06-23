@@ -284,7 +284,7 @@ func CreateMountPoint(imageURL string, rootURL string) {
 			",upperdir=" + rootURL + "/upper" +
 			",workdir=" + rootURL + "/work"
 	} else {
-		fakeRoot := "/home/eintr/Downloads/root"
+		fakeRoot := "/tmp/root"
 		dirs = "lowerdir=" + fakeRoot +
 			",upperdir=" + rootURL + "/upper" +
 			",workdir=" + rootURL + "/work"

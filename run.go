@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/impact-eintr/dockee/cgroups"
-	"github.com/impact-eintr/dockee/cgroups/subsystems"
-	"github.com/impact-eintr/dockee/container"
-	"github.com/impact-eintr/dockee/network"
 	log "github.com/sirupsen/logrus"
+	"github.com/stleox/dockee/cgroups"
+	"github.com/stleox/dockee/cgroups/subsystems"
+	"github.com/stleox/dockee/container"
+	"github.com/stleox/dockee/network"
 )
 
 type ContainerInfo struct {

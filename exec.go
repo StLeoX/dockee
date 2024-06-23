@@ -8,9 +8,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/impact-eintr/dockee/container"
-	_ "github.com/impact-eintr/dockee/nsenter"
 	"github.com/sirupsen/logrus"
+	"github.com/stleox/dockee/container"
+	_ "github.com/stleox/dockee/nsenter"
 )
 
 const (

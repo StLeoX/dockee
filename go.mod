@@ -1,4 +1,4 @@
-module github.com/impact-eintr/dockee
+module github.com/stleox/dockee
 
 go 1.17
 

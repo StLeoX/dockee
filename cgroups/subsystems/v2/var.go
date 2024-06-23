@@ -1,7 +1,7 @@
 package v2
 
 import (
-	"github.com/impact-eintr/dockee/cgroups/subsystems"
+	"github.com/stleox/dockee/cgroups/subsystems"
 )
 
 var (
