@@ -92,7 +92,11 @@ func (ipam *IPAM) Allocate(subnet *net.IPNet) (ip net.IP, err error) {
 		logrus.Errorf("Error dump allocation info, %v", err)
 	}
 
-	_, subnet, _ = net.ParseCIDR(subnet.String())
+	_, subnet, err = net.ParseCIDR(subnet.String())
+	if err != nil {
+		logrus.Errorf("Error parsing CIDR: %v", err)
+		return
+	}
 
 	one, size := subnet.Mask.Size()
 

@@ -1,3 +1,5 @@
+# How To Play
+
 
 
 ## Build
@@ -77,6 +79,8 @@ OPTIONS:
    -e value          set environment
    --net value       container network
    -p value          port mapping
+example:
+	sudo ./dockee run -image mycentos --net mynetwork -it /bin/sh
 ```
 
 
@@ -94,6 +98,9 @@ COMMANDS:
 
 OPTIONS:
    --help, -h  show help
+   
+example:
+	sudo ./dockee network create --driver bridge --subnet 192.168.33.0/24 mynetwork
 ```
 
 
@@ -107,7 +114,9 @@ docker pull roboxes/centos8:latest
 
 docker run -it --name mycentos roboxes/centos8:latest
 
-docker export - o mycentos.tar 835360ffl6b8 （container ID)
+docker export - o mycentos.tar 835360ffl6b8 （容器 ID)
+
+# 将镜像放到指定位置 dockee/Images 否则找不到
 
 mv mycentos.tar dockee/Images
 ```

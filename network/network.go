@@ -139,9 +139,17 @@ func Init() (err error) {
 	}
 
 	err = filepath.Walk(defaultNetworkPath, func(nwPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			logrus.Errorf("error walking the path %s: %v", nwPath, err)
+			return err
+		}
+		if info == nil {
+			logrus.Errorf("file info is nil for path: %s", nwPath)
+		}
 		if strings.Count(nwPath, "/")-strings.Count(defaultNetworkPath, "/") > 0 || info.IsDir() {
 			return nil
 		}
+
 		_, nwName := path.Split(nwPath)
 		nw := &Network{
 			Name: nwName,
@@ -149,11 +157,15 @@ func Init() (err error) {
 
 		if err := nw.load(nwPath); err != nil {
 			logrus.Errorf("error load network: %s", err)
+			return err
 		}
 		networks[nwName] = nw
 		return nil
 	})
 
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
