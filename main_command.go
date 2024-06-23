@@ -36,7 +36,7 @@ var reInitCommand = cli.Command{
 
 var runCommand = cli.Command{
 	Name:  "run",
-	Usage: "Create a container",
+	Usage: "create a container",
 	Flags: []cli.Flag{
 		cli.BoolFlag{
 			Name:  "it",
